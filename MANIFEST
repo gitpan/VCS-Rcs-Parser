@@ -1,0 +1,15 @@
+Changes
+MANIFEST
+Makefile.PL
+test.pl
+YappRcsParser.yp
+lib/Rcs/Deltatext.pm
+lib/Rcs/Parser.pm
+lib/Rcs/YappRcsParser.pm
+examples/t.pl
+examples/test_rcs.bash
+examples/test.sh             
+examples/test_co_db.sh       
+examples/test_co_db_grep.sh
+examples/test_co_db.pl       
+examples/test_co_db_grep.pl  

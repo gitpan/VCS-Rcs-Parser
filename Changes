@@ -1,0 +1,58 @@
+Revision history for Perl extension Rcs::Parser.
+
+2001-10-01  Ziya Suzen  <ziya@ripe.net>
+
+	* lib/Rcs/Deltatext.pm, lib/Rcs/Parser.pm, lib/Rcs/YappRcsParser.pm:
+	date co future added.
+
+	* YappRcsParser.yp: date co routine added.
+
+	* lib/Rcs/Deltatext.pm, lib/Rcs/Parser.pm, lib/Rcs/YappRcsParser.pm, YappRcsParser.yp:
+	Fixed a bug in the lexer, causing strings ending without a new line to breake the syntax in the grammar.
+
+2001-09-27  Ziya Suzen  <ziya@ripe.net>
+
+	* examples/test.sh, examples/test_co_db.pl, examples/test_co_db.sh, examples/test_co_db_grep.pl:
+	.
+
+	* lib/Rcs/Deltatext.pm, lib/Rcs/Parser.pm, lib/Rcs/YappRcsParser.pm:
+	added copyright info.
+
+	* examples/test.sh, examples/test_co_db.pl, examples/test_co_db.sh, examples/test_co_db_grep.pl, examples/test_co_db_grep.sh:
+	added some new test.
+
+	* MANIFEST, YappRcsParser.yp:
+	added some new files to MANIFEST, Copyright to Yapp Grammar.
+
+2001-09-14  Ziya Suzen  <ziya@ripe.net>
+
+	* lib/Rcs/Parser.pm:
+	a little nasty bug; do not use the time as the key in the hash; there may be some people doing a quick check in more then once less then a second!!!
+
+2001-09-12  Ziya Suzen  <ziya@ripe.net>
+
+	* lib/Rcs/Deltatext.pm, lib/Rcs/YappRcsParser.pm, YappRcsParser.yp:
+	sorted the problem of calling new more then onece in one program.
+
+	* lib/Rcs/Deltatext.pm, lib/Rcs/YappRcsParser.pm: version info added.
+	a smal fix to check emty text.
+
+	* YappRcsParser.yp: version info added.
+
+2001-09-11  Ziya Suzen  <ziya@ripe.net>
+
+	* lib/Rcs/Parser.pm, lib/Rcs/YappRcsParser.pm, YappRcsParser.yp:
+	Last fixes.
+
+	* examples/t.pl, examples/test_rcs.bash, MANIFEST: Examples added.
+
+	* Changes, MANIFEST, Makefile.PL, YappRcsParser.yp, lib/Rcs/Deltatext.pm, lib/Rcs/Parser.pm, lib/Rcs/YappRcsParser.pm, test.pl:
+	Initial release.
+
+	* Changes, MANIFEST, Makefile.PL, YappRcsParser.yp, lib/Rcs/Deltatext.pm, lib/Rcs/Parser.pm, lib/Rcs/YappRcsParser.pm, test.pl:
+	New file.
+
+0.01  Tue Sep 11 11:23:32 2001
+	- original version; created by h2xs 1.20 with options
+		-X -n Rcs::Parser
+
