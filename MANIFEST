@@ -3,6 +3,7 @@ MANIFEST
 Makefile.PL
 test.pl
 YappRcsParser.yp
+README
 lib/Rcs/Deltatext.pm
 lib/Rcs/Parser.pm
 lib/Rcs/YappRcsParser.pm
@@ -13,3 +14,12 @@ examples/test_co_db.sh
 examples/test_co_db_grep.sh
 examples/test_co_db.pl       
 examples/test_co_db_grep.pl  
+examples/RCS/Changes
+examples/RCS/Deltatext.pm
+examples/RCS/MANIFEST
+examples/RCS/Makefile.PL
+examples/RCS/Parser.pm
+examples/RCS/YappRcsParser.pm
+examples/RCS/YappRcsParser.yp
+examples/RCS/test.pl
+examples/co.pl

@@ -10,7 +10,7 @@ do
     do 
         r=${i#revision }
         co -r$r -x $f
-        grep ^allocated $f 
+        grep ^r $f 
         rm -f $f
         
     done

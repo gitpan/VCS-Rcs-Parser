@@ -1,4 +1,78 @@
-%{
+head	1.10;
+access;
+symbols
+	rel-0-1:1.1.1.1 ziya:1.1.1;
+locks; strict;
+comment	@# @;
+
+
+1.10
+date	2001.10.03.15.31.57;	author ziya;	state Exp;
+branches;
+next	1.9;
+
+1.9
+date	2001.10.03.15.07.27;	author ziya;	state Exp;
+branches;
+next	1.8;
+
+1.8
+date	2001.10.02.16.27.21;	author ziya;	state Exp;
+branches;
+next	1.7;
+
+1.7
+date	2001.10.01.16.22.32;	author ziya;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	2001.10.01.08.34.36;	author ziya;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	2001.09.27.18.26.28;	author ziya;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	2001.09.12.16.31.25;	author ziya;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2001.09.12.14.30.58;	author ziya;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2001.09.11.15.52.21;	author ziya;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2001.09.11.12.26.01;	author ziya;	state Exp;
+branches
+	1.1.1.1;
+next	;
+
+1.1.1.1
+date	2001.09.11.12.26.01;	author ziya;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.10
+log
+@last modifications for namespace change.
+@
+text
+@%{
 
 ##########################################################################
 #
@@ -79,7 +153,7 @@
 
     use Data::Dumper;
 
-    our ($VERSION) = (q$Revision: 1.11 $ =~ /([\d\.]+)/);
+    our ($VERSION) = (q$Revision: 1.1 $ =~ /([\d\.]+)/);
 
     my $dt;
     my $input;
@@ -209,27 +283,27 @@ sub revs_to_co {
         $date{$rdate} = $rev;
     }
 
-    my @alldates  = sort keys %date;
-    my @dates2add = @$dates_to_co;
+    my @@alldates  = sort keys %date;
+    my @@dates2add = @@$dates_to_co;
 
     my $bi=0;
-    my($a,$b,@dates2add_proper);
+    my($a,$b,@@dates2add_proper);
 
-    for $b (@dates2add) {
-	for $a (@alldates) {
+    for $b (@@dates2add) {
+	for $a (@@alldates) {
 	    $dates2add_proper[$bi]=$a if ($a lt $b);
 	}
 	$bi++;
     }
 
-    for (@dates2add_proper) {
-	push @$revs, $date{$_} if (defined $date{$_});
+    for (@@dates2add_proper) {
+	push @@$revs, $date{$_} if (defined $date{$_});
     }
 
     if($debug){
-        print STDERR "$_\n" for(@$revs);
-        print STDERR "$_\n" for(@dates2add_proper);
-        print STDERR "$_\n" for(@dates2add);
+        print STDERR "$_\n" for(@@$revs);
+        print STDERR "$_\n" for(@@dates2add_proper);
+        print STDERR "$_\n" for(@@dates2add);
     }
 
     $dt->revs2co($revs);
@@ -265,7 +339,7 @@ sub _Error {
         delete $_[0]->YYData->{ERRMSG};
         return;
     };
-    warn "\nSyntax error.\n";
+    warn "Syntax error.\n";
 
 }
 
@@ -286,16 +360,16 @@ sub _Lexer {
 
         $state = 'norm';
 
-        return('',[ undef, -1 ]) if ($$input !~ m/\G[\s\n]*@/sgc);
+        return('',[ undef, -1 ]) if ($$input !~ m/\G[\s\n]*@@/sgc);
 
         my $text_tmp='';
         my $text;
-        while ($$input =~ m/\G((?:[^@\n]|@@)*\n?)/gcs) {
+        while ($$input =~ m/\G((?:[^@@\n]|@@@@)*\n?)/gcs) {
             $text_tmp = $1;
-            $text_tmp =~ s/@@/@/g;
+            $text_tmp =~ s/@@@@/@@/g;
             $text .= $text_tmp;
         }
-        return('',[ undef, -1 ]) if ($$input !~ m/\G[\s\n]*@/sgc);
+        return('',[ undef, -1 ]) if ($$input !~ m/\G[\s\n]*@@/sgc);
 
         return('string',[\$text]);
     };
@@ -346,17 +420,17 @@ sub _Lexer {
         # id
         $$input =~ m/\G
                          ((?:[\d\.]+)?)                      # {num}
-                         ([^\$,\.:;@\x00-\x1F])              # idchar
-                         ([^\$,\.:;@\x00-\x1F]|(?:[\d\.]+))* # {idchar | num}*
+                         ([^\$,\.:;@@\x00-\x1F])              # idchar
+                         ([^\$,\.:;@@\x00-\x1F]|(?:[\d\.]+))* # {idchar | num}*
                     /xgc                      
                                     and return('id',      [$1,$2,$3] );
 
 
         # simple string
         $$input =~ m/\G
-                           @
-                           ((?:[^@]|@@)*)
-                           @
+                           @@
+                           ((?:[^@@]|@@@@)*)
+                           @@
                     /xgcs                      
                                     and return('string',  [$1] );
 
@@ -373,8 +447,8 @@ sub _Lexer {
         $$input =~ m{\G
                          (?:
                          (\d?)
-                         ([^\$,\.:;@\x00-\x1F])
-                         ([^\$,\.:;@\x00-\x1F]*)
+                         ([^\$,\.:;@@\x00-\x1F])
+                         ([^\$,\.:;@@\x00-\x1F]*)
                          )*
                    }xgc           
                    and return('ids', [$1,$2,$3]);
@@ -391,8 +465,8 @@ sub _Lexer {
         $$input =~ m{\G
                          (?:
                          (\d*)                   # {digit}*
-                         ([^\$,\.:;@\x00-\x1F])  # idchar
-                         ([^\$,\.:;@\x00-\x1F]*) # {idchar | digit}*
+                         ([^\$,\.:;@@\x00-\x1F])  # idchar
+                         ([^\$,\.:;@@\x00-\x1F]*) # {idchar | digit}*
                          :                       # :
                          ([\d\.]+)[\s\n\r]*      # num
                          )*
@@ -412,8 +486,8 @@ sub _Lexer {
                          (?:
 
                          ((?:[\d\.]+)?)                      # {num}
-                         ([^\$,\.:;@\x00-\x1F])              # idchar
-                         ([^\$,\.:;@\x00-\x1F]|(?:[\d\.]+))* # {idchar | num}*
+                         ([^\$,\.:;@@\x00-\x1F])              # idchar
+                         ([^\$,\.:;@@\x00-\x1F]|(?:[\d\.]+))* # {idchar | num}*
                          :                                   # :
                          ([\d\.]+)                           # num
                          )*
@@ -432,8 +506,8 @@ sub _Lexer {
         $$input =~ m{\G
                          (?:
                          ((?:[\d\.]+)?)                      # {num}
-                         ([^\$,\.:;@\x00-\x1F])              # idchar
-                         ([^\$,\.:;@\x00-\x1F]|(?:[\d\.]+))* # {idchar | num}*
+                         ([^\$,\.:;@@\x00-\x1F])              # idchar
+                         ([^\$,\.:;@@\x00-\x1F]|(?:[\d\.]+))* # {idchar | num}*
                          )?
                    }xgc           
                    and return('ido', [$1,$2,$3]);
@@ -465,8 +539,6 @@ sub Run {
     $revs_to_co  = shift;
     $dates_to_co = shift;
 
-    $dt = undef;
-
     $dt = new VCS::Rcs::Deltatext();
     $state = 'norm';
     $ft = 1;
@@ -476,3 +548,172 @@ sub Run {
 
     $dt
 }
+@
+
+
+1.9
+log
+@namespace changed from Rcs:: to VCS::Rcs::
+@
+text
+@d78 1
+a78 1
+    use Rcs::Deltatext;
+d82 1
+a82 1
+    our ($VERSION) = (q$Revision: 1.1 $ =~ /([\d\.]+)/);
+d468 1
+a468 1
+    $dt = new Rcs::Deltatext();
+@
+
+
+1.8
+log
+@Solved some 'undefined ...' warnings.
+@
+text
+@d9 1
+a9 1
+#yapp -s -m 'Rcs::YappRcsParser' -o 'lib/Rcs/YappRcsParser.pm' YappRcsParser.yp
+d82 1
+a82 1
+    our ($VERSION) = (q$Revision: 1.1 $ =~ /([\d\.]+)/);
+@
+
+
+1.7
+log
+@date co routine added.
+@
+text
+@d82 1
+a82 1
+    our ($VERSION) = (q$Revision: 1.1 $ =~ /([\d\.]+)/);
+d225 3
+a227 1
+    push @@$revs, $date{$_} for (@@dates2add_proper);
+@
+
+
+1.6
+log
+@Fixed a bug in the lexer, causing strings ending without a new line to breake the syntax in the grammar.
+@
+text
+@d80 3
+a82 1
+    our ($VERSION) = (q$Revision: 1.1 $ =~ /([\d\.]+)/);
+d88 3
+a90 1
+    my $init_rev_no;
+a92 1
+    require Data::Dumper if $debug;
+d168 2
+a169 1
+desc:    DESC  string 
+d180 1
+a180 1
+             #print STDERR $_[2][0],"        \r";
+d194 42
+d240 1
+a240 1
+    $init_rev_no = $rev;
+d461 4
+a464 2
+    my $self =shift;
+    $input   =shift;
+d466 1
+a466 1
+    $dt = new Rcs::Deltatext;
+d469 1
+a469 1
+    $init_rev_no = undef;
+@
+
+
+1.5
+log
+@added some new files to MANIFEST, Copyright to Yapp Grammar.
+@
+text
+@d80 1
+a80 1
+    our ($VERSION) = (q$Revision: 1.1 $ =~ /([\d\.]+)/);
+d245 1
+a245 1
+        while ($$input =~ m/\G((?:[^@@\n]|@@@@)*\n)/gcs) {
+@
+
+
+1.4
+log
+@sorted the problem of calling new more then onece in one program.
+@
+text
+@d32 42
+d80 1
+a80 1
+    our ($VERSION) = (q$Revision: 1.1 $ =~ /([\d\.]+)/);
+@
+
+
+1.3
+log
+@version info added.
+@
+text
+@d38 1
+a38 3
+    our ($VERSION) = (q$Revision: 1.1 $ =~ /([\d\.]+)/);
+
+    my $dt = new Rcs::Deltatext;
+d40 1
+d42 3
+a44 4
+
+    my $state = 'norm';
+
+    my $ft = 1;
+a48 2
+    my $init_rev_no;
+
+d375 5
+@
+
+
+1.2
+log
+@Last fixes.
+@
+text
+@d6 1
+a6 1
+# you should have CPAN module Parse::Yapp installed on you 
+d35 1
+a35 1
+    use Data::Dumper;
+d38 2
+d48 2
+a49 1
+    my $debug = 0;
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d61 1
+a61 1
+                      {warn "Parsed OK!\n";}
+@
+
+
+1.1.1.1
+log
+@Initial release.
+@
+text
+@@

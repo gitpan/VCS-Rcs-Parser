@@ -1,4 +1,73 @@
-#
+head	1.9;
+access;
+symbols
+	rel-0-1:1.1.1.1 ziya:1.1.1;
+locks; strict;
+comment	@# @;
+
+
+1.9
+date	2001.10.03.15.31.59;	author ziya;	state Exp;
+branches;
+next	1.8;
+
+1.8
+date	2001.10.03.15.07.35;	author ziya;	state Exp;
+branches;
+next	1.7;
+
+1.7
+date	2001.10.02.16.27.26;	author ziya;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	2001.10.01.16.23.02;	author ziya;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	2001.10.01.08.34.47;	author ziya;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	2001.09.27.18.26.58;	author ziya;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2001.09.14.16.02.29;	author ziya;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2001.09.11.15.52.24;	author ziya;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2001.09.11.12.26.01;	author ziya;	state Exp;
+branches
+	1.1.1.1;
+next	;
+
+1.1.1.1
+date	2001.09.11.12.26.01;	author ziya;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.9
+log
+@last modifications for namespace change.
+@
+text
+@#
 # Copyright (c) 2001 by RIPE-NCC.  All rights reserved.
 #
 # This program is free software; you can redistribute it and/or
@@ -38,8 +107,7 @@
 #
 #                     END OF TERMS AND CONDITIONS
 #
-#$Revision: 1.12 $
-
+#
 package VCS::Rcs::Parser;
 
 require 5.6.0;
@@ -48,13 +116,16 @@ use warnings;
 use Carp;
 
 use VCS::Rcs::YappRcsParser;
+use VCS::Rcs::Deltatext;
 
-our $VERSION = '0.06';
+our $VERSION = '0.04';
+
+my $dt;
 
 sub new {
     my $this  = shift;
     my $rtext = shift;
-    my %param = @_;
+    my %param = @@_;
 
     my $revs  = delete $param{revs};
     my $dates = delete $param{dates};
@@ -74,10 +145,10 @@ sub new {
 
 
     my $rcs = new VCS::Rcs::YappRcsParser;
-    $self->{__dt__} = $rcs->Run($rtext, $revs, $dates);  # VCS::Rcs::Deltatext
+    $dt = $rcs->Run($rtext, $revs, $dates);  # VCS::Rcs::Deltatext
 
-    for my $rev ($self->{__dt__}->revs) {
-        my $rdate = $self->{__dt__}->date($rev);
+    for my $rev ($dt->revs) {
+        my $rdate = $dt->date($rev);
 	next unless (defined $rdate);
         $rdate = '19'.$rdate if (length($rdate) ==  17);
         $self->{__date_index__}{$rdate} = $rev;
@@ -90,33 +161,31 @@ sub new {
 
 sub co {
     my $self = shift;
-    my %param = @_;
+    my %param = @@_;
 
     my $rev  = delete $param{rev};
     my $date = delete $param{date};
 
     croak "Unexpected Parameter(s):",(join ',', keys %param) if %param;
  
-    return $self->{__dt__}->rev($rev) if (defined $rev);
+    return $dt->rev($rev) if (defined $rev);
 
-    my @alldates  = sort keys %{$self->{__date_index__}};
+    my @@alldates  = sort keys %{$self->{__date_index__}};
 
 
     my($a,$date_proper);
 
-    for $a (@alldates) {
+    for $a (@@alldates) {
 	$date_proper=$a if ($a lt $date);
     }
-    $date_proper=$alldates[-1] if ($alldates[-1] lt $date);
 
-    no warnings;
-    $self->{__dt__}->rev($self->{__date_index__}{$date_proper})
+    $dt->rev($self->{__date_index__}{$date_proper})
 }
 
 
 sub revs {
     my $self = shift;
-    my %param = @_;
+    my %param = @@_;
 
     my $index = delete $param{index};
 
@@ -147,56 +216,157 @@ VCS::Rcs::Parser - Perl extension for RCSfile Parsing
   # Read a *,v file into $text
   $text = do {local $/; <>};
 
-  my $rcs = VCS::Rcs::Parser->new(\$text); # Checkout all the revisions
-
-  or
- 
-  my $rcs = VCS::Rcs::Parser->new(\$text, 
-                                  dates=> ['2001.01.01', '2001.03'],
-                                  revs => ['1.1', '1.5'] )
-                or warn "Error Parsing $file\n";
-
-  my $dates = $rcs->revs(index => 'date'); # ref. to a hash ( dates=>revs )
-  my $revs  = $rcs->revs(index => 'rev' ); # ref. to a hash ( revs=>dates )
+  my $rcs = VCS::Rcs::Parser->new(\$text);
 
   print $rcs->co(rev => '1.1');
-  print $rcs->co(date => '2001.01.01');
 
 
 =head1 DESCRIPTION
 
 Reads a ',v' RCS revisions file and checks out every revision into core.
-
-=head1 METHODS
-
-new: Takes one mandatory parameter, which is a referance to the Scalar 
-containing the revision file. And two optionals, date=>[], and revs=>[] 
-with the list of dates or revisions to be read into core.
-
-revs: takes one parametre, index=>'' with a value 'date' or 'rev'. this
-method lists the revisions put in the memory in to a hash referance, 
-dates as the keys, or revisions respectivly.
-
-co: Accepts one parametre rev, or date, with the value revision or date. 
-Returns a scalar containing the revision.
-
-=head1 BUGS
-
-* 0.04 has a memory leak!!! upgrade
-
-* 'CO' algoritm does not follow branches, or even 'next's.
-  It only follows the order deltatext is written to the ,v
-  revision file.
-
-* Probably more!
-
+There will be more documentation soon.
 
 =head1 AUTHOR
 
-Ziya Suzen, ziya@ripe.net
+Ziya Suzen, ziya@@ripe.net
 
 =head1 SEE ALSO
 
 perl(1).
 
 =cut
+@
+
+
+1.8
+log
+@namespace changed from Rcs:: to VCS::Rcs::
+@
+text
+@d78 2
+a79 2
+    my $rcs = new Rcs::YappRcsParser;
+    $dt = $rcs->Run($rtext, $revs, $dates);  # Rcs::Deltatext
+d141 1
+a141 1
+Rcs::Parser - Perl extension for RCSfile Parsing
+d145 1
+a145 1
+  use Rcs::Parser;
+d150 1
+a150 1
+  my $rcs = Rcs::Parser->new(\$text);
+@
+
+
+1.7
+log
+@Solved some 'undefined ...' warnings.
+@
+text
+@d42 1
+a42 1
+package Rcs::Parser;
+d49 2
+a50 2
+use Rcs::YappRcsParser;
+use Rcs::Deltatext;
+@
+
+
+1.6
+log
+@date co future added.
+@
+text
+@d52 1
+a52 1
+our $VERSION = '0.03';
+d83 1
+d125 3
+a127 1
+    $index eq 'date' and return ($self->{__rev_index__});
+@
+
+
+1.5
+log
+@Fixed a bug in the lexer, causing strings ending without a new line to breake the syntax in the grammar.
+@
+text
+@d47 1
+d52 1
+a52 1
+our $VERSION = '0.02';
+d59 14
+d77 1
+d79 8
+a86 1
+    $dt = $rcs->Run($rtext); # Rcs::Deltatext
+d96 17
+a112 1
+    $dt->rev($param{rev})
+d120 7
+a126 11
+    $param{index} eq 'date' and do {
+	my %date;
+	my $rdate;
+	my $rev;
+        for $rev ($dt->revs) {
+            $rdate = $dt->date($rev);
+	    $rdate = '19'.$rdate if (length($rdate) ==  17);
+            $date{$rev} = $rdate;
+        }
+	return (\%date);
+    }
+@
+
+
+1.4
+log
+@added copyright info.
+@
+text
+@d51 1
+a51 1
+our $VERSION = '0.01';
+@
+
+
+1.3
+log
+@a little nasty bug; do not use the time as the key in the hash; there may be some people doing a quick check in more then once less then a second!!!
+@
+text
+@d1 41
+d119 2
+@
+
+
+1.2
+log
+@Last fixes.
+@
+text
+@d47 1
+a47 1
+            $date{$rdate} = $rev;
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@a40 1
+	print "IN INDEX DATE\n";
+@
+
+
+1.1.1.1
+log
+@Initial release.
+@
+text
+@@

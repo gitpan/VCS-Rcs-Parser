@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-our $VERSION = sprintf("%d.%02d", q$Revision: 1.3 $ =~ /(\d+)\.(\d+)/);
+our $VERSION = sprintf("%d.%02d", q$Revision: 1.4 $ =~ /(\d+)\.(\d+)/);
 
 use VCS::Rcs::Parser;
 
@@ -35,7 +35,7 @@ while (my $file = readdir(DIR)) {
 
     warn "getting revisions of file:$file\n";
 
-    $revs = $rcs->revs(index=>'date');
+    $revs = $rcs->revs(index=>'rev');
 
     for $rev (sort keys %$revs) {
 
@@ -47,7 +47,7 @@ while (my $file = readdir(DIR)) {
 
 	    $line = $1;
 
-            if ($line =~ m/^allocated:/ ) 
+            if ($line =~ m/^r/ ) 
                   {
                       print $line;
                   }

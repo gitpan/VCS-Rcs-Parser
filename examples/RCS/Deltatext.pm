@@ -1,4 +1,73 @@
-#
+head	1.9;
+access;
+symbols
+	rel-0-1:1.1.1.1 ziya:1.1.1;
+locks; strict;
+comment	@# @;
+
+
+1.9
+date	2001.10.03.15.31.59;	author ziya;	state Exp;
+branches;
+next	1.8;
+
+1.8
+date	2001.10.03.15.07.35;	author ziya;	state Exp;
+branches;
+next	1.7;
+
+1.7
+date	2001.10.02.16.27.26;	author ziya;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	2001.10.01.16.23.02;	author ziya;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	2001.10.01.08.34.47;	author ziya;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	2001.09.27.18.26.58;	author ziya;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2001.09.12.16.31.28;	author ziya;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2001.09.12.14.31.20;	author ziya;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2001.09.11.12.26.01;	author ziya;	state Exp;
+branches
+	1.1.1.1;
+next	;
+
+1.1.1.1
+date	2001.09.11.12.26.01;	author ziya;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.9
+log
+@last modifications for namespace change.
+@
+text
+@#
 # Copyright (c) 2001 by RIPE-NCC.  All rights reserved.
 #
 # This program is free software; you can redistribute it and/or
@@ -47,12 +116,10 @@ use warnings;
 
 use Data::Dumper;
 
-use constant LINE => 0;
-use constant NEXT => 1;
-use constant PREV => 2;
+our ($VERSION) = (q$Revision: 1.1 $ =~ /([\d\.]+)/);
 
-our ($VERSION) = (q$Revision: 1.11 $ =~ /([\d\.]+)/);
-
+my $t;
+my %a;
 our $debug = 0;
 
 our $AUTOLOAD;
@@ -63,6 +130,8 @@ sub new {
     my $this  = shift;
     my $class = ref($this) || $this;
     my $self = {};
+    $t = undef;
+    %a = ();
 
     bless $self, $class;
 }
@@ -77,48 +146,32 @@ sub revs2co {
 
 # Convert plain text into linked list by lines
 sub _text2list {
+    my $self = shift;
     my $text = shift;
-    
+
     return [undef,undef,undef] unless defined($$text);
-    
+
     my $pp;
     my $p0 = [undef,undef,undef];
     my $p  = $p0;
-    while ($$text=~/\G([^\n]*\n)/gcs) {
+    while ($$text =~ /\G([^\n]*\n)/gcs) {
         $pp = $p;
         $p = [$1, undef, $pp];
-        $pp->[NEXT] = $p;
+        $pp->[1] = $p;
     }
-    $p0;
+    $p0
 }
 
 
 # Convert a linked list into plain text
 sub _list2text {
+    my $self = shift;
     my $p = shift;
     my $text;
-    $text .= $p->[LINE] while ($p = $p->[NEXT]);
-    return \$text;
+    $text .= $p->[0] while ($p = $p->[1]);
+    return $text;
 }
 
-
-# Keyword subs. (only Revision for now)
-sub _kv {
-    my $text = shift;
-    my $rev = shift;
-
-    pos($$text)=0;
-
-    $rev = '$'."Revision: $rev ".'$';
-
-    my $ltext;
-    while ($$text=~/\G([^\n]*\n)/gcs) {
-	my $tmp = $1;
-	$tmp=~s{\x24Revision:[^\$]*\$}{$rev}g;
-	$ltext .= $tmp;
-    }
-    return $ltext;
-}
 
 # Get the 'latest revision' first
 sub lastrev {
@@ -126,9 +179,8 @@ sub lastrev {
     my $text = shift;
     my $rev  = shift;
 
-    $self->{__t__} = &_text2list($text);
-
-    $self->{rev}->{$rev}->{__text__} = &_kv($text,$rev);
+    $t = $self->_text2list($text);
+    $self->{rev}->{$rev}->{__text__} = $$text;
 }
 
 
@@ -146,47 +198,46 @@ sub deltarev {
 
     return unless (defined($text));
 
+    my $pr = $self->_text2list($text);
+
     # parse deltatext into a struct
-    $self->{__a__} = {};
-    pos($$text)=0;
-    while ($$text=~/\G([^\n]*\n)/gcs) {
+    %a = ();
+    while ($pr = $pr->[1]){
+      
+	$pr->[0] =~ /^(a|d)(\d+)\s+(\d+)/;
 
-	my $tmp=$1;
-	my($ad,$lineno,$numoflines) = ($tmp =~ /^(a|d)(\d+)\s+(\d+)/);
+        $a{$2}{$1} = $3;
 
-        $self->{__a__}{$lineno}{$ad} = $numoflines;
+        next if ($1 eq 'd');
 
-        next if ($ad eq 'd');
-
-        for (my $i = 0; $i < $numoflines; $i++){
-	    $$text=~/\G([^\n]*\n)/gcs;
-            push @{ $self->{__a__}{$lineno}{a_line} } , $1;
+        for (my $i = 0; $i < $3; $i++){
+	    $pr = $pr->[1]; # next
+            push @@{ $a{$2}{a_line} } , $pr->[0];
 	}
     }
 
     if ($debug) {
-        print STDERR "\na:", Data::Dumper->Dump([$self->{__a__}]);
+        print STDERR "\na:", Data::Dumper->Dump([\%a]);
     }
 
     # do 'co' one revision
-    my $p = $self->{__t__};
+    my $p = $t;
     my $i = 0;
-    while ($p->[NEXT]){
+    while ($p->[1]){
 
-	($p, $i) = $self->do_rev($p, $i);
+	($p, $i) = &do_rev($p, $i);
 
-	$p = $p->[NEXT];  # next
+	$p = $p->[1];  # next
         $i++;
     }
     # anything left to do? do it then:
-    ($p, $i) = $self->do_rev($p, $i);
+    ($p, $i) = &do_rev($p, $i);
 
-    no warnings;
     # co everything if nothing is specified or
     # co only the wanted revisions texts ( this may save memory sometimes ;)
-    if ( !$self->{__revs__} or (grep {$rev eq $_} @{$self->{__revs__}}) ) {
-        $self->{rev}->{$rev}->{__text__} = 
-	    &_kv(&_list2text($self->{__t__}),$rev);
+    if ( !$self->{__revs__} or (grep {$rev eq $_} @@{$self->{__revs__}}) ) {
+
+        $self->{rev}->{$rev}->{__text__} = $self->_list2text($t);
     }
 
 }
@@ -195,8 +246,6 @@ sub deltarev {
 # Get a specific revision.
 sub rev {
     my $self = shift;
-
-    no warnings;
     my $rev  = shift;
 
     $self->{rev}->{$rev}->{__text__};
@@ -207,7 +256,7 @@ sub rev {
 sub revs {
     my $self = shift;
 
-    $self->{__revs__} ?  @{$self->{__revs__}} : keys(%{$self->{rev}})
+    $self->{__revs__} ?  @@{$self->{__revs__}} : keys(%{$self->{rev}})
 }
 
 
@@ -221,15 +270,11 @@ sub allrevs {
 
 # internal: wrapper aroud 'add's and 'delete's
 sub do_rev {
-    my $self = shift;
     my $p = shift;
     my $i = shift;
 
-    ($p, $i) = &d_rev($p, $self->{__a__}{$i}{d}, $i)      
-	if (exists $self->{__a__}{$i}{d});
-
-    $p       = &a_rev($p, $self->{__a__}{$i}{a_line},$i)  
-	if (exists $self->{__a__}{$i}{a});
+    ($p, $i) = &d_rev($p, $a{$i}{d}, $i)      if (exists $a{$i}{d});
+    $p =       &a_rev($p, $a{$i}{a_line},$i)  if (exists $a{$i}{a});
 
     ($p, $i)
 }
@@ -242,14 +287,14 @@ sub d_rev {
     my $i = shift;
 
     for (my $k = 0; $k < $j; $k++) {
-        $p->[PREV]->[NEXT] = $p->[NEXT];
-        $p->[NEXT]->[PREV] = $p->[PREV];
-        $p = $p->[NEXT];
+        $p->[2]->[1] = $p->[1];
+        $p->[1]->[2] = $p->[2];
+        $p = $p->[1];
     }
 
     $i = $i + $j - 1;
 
-    ($p->[PREV], $i)
+    ($p->[2], $i)
 }
 
 
@@ -259,11 +304,11 @@ sub a_rev {
     my $a = shift;
 
     my $n;
-    for (@$a) {
-        $n = [$_,$p->[NEXT],$p];
-        $p->[NEXT]->[PREV] = $n;
-        $p->[NEXT] = $n;
-        $p = $n;
+    for (@@$a) {
+        $n = [$_,$p->[1],$p];
+        $p->[1]->[2] = $n;
+        $p->[1] = $n;
+        $p = $p->[1];
     }
     $p
 }
@@ -283,28 +328,7 @@ sub AUTOLOAD {
 
 
 sub DESTROY {
-    my $self = shift;
-    my $p = $self->{__t__};
-
-    my $tmp_p;
-    my $i;
-    #warn "\n\n";
-    while ($p->[NEXT]){
-        $tmp_p = $p->[NEXT];
-        $p->[NEXT]=undef;
-        $p->[PREV]=undef;
-	$p = $tmp_p;  # next
-	#print STDERR $i++;
-    }
-    $self->{__t__}=undef;
-    #print STDERR Data::Dumper->Dump([$self->{__t__}]);
-
-    for my $arevs (keys %{$self->{rev}}) {
-	$self->{rev}->{$arevs}->{__text__}=undef;
-    }
-  
-    $self={};
-    #warn "\n\n";
+    undef $t;
 }
 
 
@@ -341,7 +365,7 @@ VCS::Rcs::Deltatext - Perl extension for RCS like Deltatext parsing
     # more 'deltarev's and details
 
 
-    @all_revisions = $dt->revs();
+    @@all_revisions = $dt->revs();
 
     print "Revisions Text    : ", $dt->rev('1.1'),      "\n";
     print "Revisions Date    : ", $dt->date('1,1'),     "\n"; 
@@ -433,7 +457,7 @@ There will be more documentation soon.
 
 =head1 AUTHOR
 
-Ziya Suzen, ziya@ripe.net
+Ziya Suzen, ziya@@ripe.net
 
 =head1 SEE ALSO
 
@@ -442,3 +466,156 @@ rcsfile(5), diff(1), patch(1), Rcs(3), perl(1).
 =cut
 
 
+@
+
+
+1.8
+log
+@namespace changed from Rcs:: to VCS::Rcs::
+@
+text
+@d50 1
+a50 1
+our ($VERSION) = (q$Revision: 1.1 $ =~ /([\d\.]+)/);
+d274 1
+a274 1
+Rcs::Deltatext - Perl extension for RCS like Deltatext parsing
+d278 1
+a278 1
+    use Rcs::Deltatext;
+d280 1
+a280 1
+    my $dt = new Rcs::Deltatext;
+d290 1
+a290 1
+    # add athor details
+d292 1
+a292 1
+    $dt->authoe($rev. $author);
+d309 1
+a309 1
+Rcs::Deltatext, simply applies 'diff -n' style patches. This format is
+d311 1
+a311 1
+use for today (as far as I know) this class is put under Rcs::. Unless
+d321 1
+a321 1
+ $o = new Rcs::Deltatext;
+d323 1
+a323 1
+Create a new instance of Rcs::Deltatext.
+@
+
+
+1.7
+log
+@Solved some 'undefined ...' warnings.
+@
+text
+@d42 1
+a42 1
+package Rcs::Deltatext;
+d50 1
+a50 1
+our ($VERSION) = (q$Revision: 1.1 $ =~ /([\d\.]+)/);
+@
+
+
+1.6
+log
+@date co future added.
+@
+text
+@d50 1
+a50 1
+our ($VERSION) = (q$Revision: 1.1 $ =~ /([\d\.]+)/);
+d186 1
+a186 1
+# Get a list of all revisions.
+d189 9
+d253 2
+@
+
+
+1.5
+log
+@Fixed a bug in the lexer, causing strings ending without a new line to breake the syntax in the grammar.
+@
+text
+@d50 1
+a50 1
+our ($VERSION) = (q$Revision: 1.1 $ =~ /([\d\.]+)/);
+d63 1
+a63 1
+    my $self  = {};
+d71 7
+d107 1
+a107 1
+# Get the 'initial revision'
+d167 7
+a173 1
+    $self->{rev}->{$rev}->{__text__} = $self->_list2text($t);
+@
+
+
+1.4
+log
+@added copyright info.
+@
+text
+@d48 3
+a50 1
+our ($VERSION) = (q$Revision: 1.1 $ =~ /([\d\.]+)/);
+a56 2
+
+require Data::Dumper if $debug;
+@
+
+
+1.3
+log
+@sorted the problem of calling new more then onece in one program.
+@
+text
+@d1 41
+d48 1
+a48 1
+our ($VERSION) = (q$Revision: 1.1 $ =~ /([\d\.]+)/);
+d362 2
+@
+
+
+1.2
+log
+@version info added.
+a smal fix to check emty text.
+@
+text
+@d7 1
+a7 1
+our ($VERSION) = (q$Revision: 1.1 $ =~ /([\d\.]+)/);
+d23 3
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d7 1
+a7 1
+our $VERSION = '0.01';
+d11 1
+a11 1
+my $debug = 0;
+d31 2
+@
+
+
+1.1.1.1
+log
+@Initial release.
+@
+text
+@@

@@ -6,13 +6,15 @@ COSHTEST='TEST_DIR/'
 
 echo "Removing the test dirs:"
 
-echo -n "removing whole $COPLTEST are you sure? (y/ctrl-C)"
-read A
-[ "$A" == "y" ] && rm -rf $COPLTEST
+#echo -n "removing whole $COPLTEST are you sure? (y/ctrl-C)"
+#read A
+#[ "$A" == "y" ] && rm -rf $COPLTEST
+rm -rf $COPLTEST
 
-echo -n "removing whole $COSHTEST are you sure? (y/ctrl-C)"
-read A
-[ "$A" == "y" ] && rm -rf $COSHTEST
+#echo -n "removing whole $COSHTEST are you sure? (y/ctrl-C)"
+#read A
+#[ "$A" == "y" ] && rm -rf $COSHTEST
+rm -rf $COSHTEST
 
 
 COPL='./test_co_db.pl'

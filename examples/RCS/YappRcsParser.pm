@@ -1,4 +1,73 @@
-####################################################################
+head	1.9;
+access;
+symbols
+	rel-0-1:1.1.1.1 ziya:1.1.1;
+locks; strict;
+comment	@# @;
+
+
+1.9
+date	2001.10.03.15.31.59;	author ziya;	state Exp;
+branches;
+next	1.8;
+
+1.8
+date	2001.10.02.16.27.26;	author ziya;	state Exp;
+branches;
+next	1.7;
+
+1.7
+date	2001.10.01.16.23.02;	author ziya;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	2001.10.01.08.34.47;	author ziya;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	2001.09.27.18.26.58;	author ziya;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	2001.09.12.16.31.28;	author ziya;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2001.09.12.14.31.20;	author ziya;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2001.09.11.15.52.24;	author ziya;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2001.09.11.12.26.01;	author ziya;	state Exp;
+branches
+	1.1.1.1;
+next	;
+
+1.1.1.1
+date	2001.09.11.12.26.01;	author ziya;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.9
+log
+@last modifications for namespace change.
+@
+text
+@####################################################################
 #
 #    This file was generated using Parse::Yapp version 1.04.
 #
@@ -8,10 +77,10 @@
 #
 ####################################################################
 package VCS::Rcs::YappRcsParser;
-use vars qw ( @ISA );
+use vars qw ( @@ISA );
 use strict;
 
-@ISA= qw ( Parse::Yapp::Driver );
+@@ISA= qw ( Parse::Yapp::Driver );
 #Included Parse/Yapp/Driver.pm file----------------------------------------
 {
 #
@@ -47,7 +116,7 @@ use Carp;
 my(%params)=(YYLEX => 'CODE', 'YYERROR' => 'CODE', YYVERSION => '',
 			 YYRULES => 'ARRAY', YYSTATES => 'ARRAY', YYDEBUG => '');
 #Mandatory parameters
-my(@params)=('LEX','RULES','STATES');
+my(@@params)=('LEX','RULES','STATES');
 
 sub new {
     my($class)=shift;
@@ -62,7 +131,7 @@ sub new {
 				DEBUG => 0,
 				CHECK => \$check };
 
-	_CheckParams( [], \%params, \@_, $self );
+	_CheckParams( [], \%params, \@@_, $self );
 
 		exists($$self{VERSION})
 	and	$$self{VERSION} < $COMPATIBLE
@@ -80,12 +149,12 @@ sub YYParse {
     my($self)=shift;
     my($retval);
 
-	_CheckParams( \@params, \%params, \@_, $self );
+	_CheckParams( \@@params, \%params, \@@_, $self );
 
 	if($$self{DEBUG}) {
 		_DBLoad();
 		$retval = eval '$self->_DBParse()';#Do not create stab entry on compile
-        $@ and die $@;
+        $@@ and die $@@;
 	}
 	else {
 		$retval = $self->_Parse();
@@ -148,7 +217,7 @@ sub YYSemval {
 	my($index)= $_[0] - ${$$self{DOTPOS}} - 1;
 
 		$index < 0
-	and	-$index <= @{$$self{STACK}}
+	and	-$index <= @@{$$self{STACK}}
 	and	return $$self{STACK}[$index][1];
 
 	undef;	#Invalid index
@@ -157,7 +226,7 @@ sub YYSemval {
 sub YYCurtok {
 	my($self)=shift;
 
-        @_
+        @@_
     and ${$$self{TOKEN}}=$_[0];
     ${$$self{TOKEN}};
 }
@@ -165,7 +234,7 @@ sub YYCurtok {
 sub YYCurval {
 	my($self)=shift;
 
-        @_
+        @@_
     and ${$$self{VALUE}}=$_[0];
     ${$$self{VALUE}};
 }
@@ -189,20 +258,20 @@ sub YYLexer {
 
 
 sub _CheckParams {
-	my($mandatory,$checklist,$inarray,$outhash)=@_;
+	my($mandatory,$checklist,$inarray,$outhash)=@@_;
 	my($prm,$value);
 	my($prmlst)={};
 
-	while(($prm,$value)=splice(@$inarray,0,2)) {
+	while(($prm,$value)=splice(@@$inarray,0,2)) {
         $prm=uc($prm);
 			exists($$checklist{$prm})
 		or	croak("Unknow parameter '$prm'");
 			ref($value) eq $$checklist{$prm}
 		or	croak("Invalid value for parameter '$prm'");
-        $prm=unpack('@2A*',$prm);
+        $prm=unpack('@@2A*',$prm);
 		$$outhash{$prm}=$value;
 	}
-	for (@$mandatory) {
+	for (@@$mandatory) {
 			exists($$outhash{$_})
 		or	croak("Missing mandatory parameter '".lc($_)."'");
 	}
@@ -220,19 +289,19 @@ sub _DBLoad {
 		and	return;
 	}
 	my($fname)=__FILE__;
-	my(@drv);
+	my(@@drv);
 	open(DRV,"<$fname") or die "Report this as a BUG: Cannot open $fname";
 	while(<DRV>) {
                 	/^\s*sub\s+_Parse\s*{\s*$/ .. /^\s*}\s*#\s*_Parse\s*$/
         	and     do {
                 	s/^#DBG>//;
-                	push(@drv,$_);
+                	push(@@drv,$_);
         	}
 	}
 	close(DRV);
 
 	$drv[0]=~s/_P/_DBP/;
-	eval join('',@drv);
+	eval join('',@@drv);
 }
 
 #Note that for loading debugging version of the driver,
@@ -242,9 +311,9 @@ sub _Parse {
     my($self)=shift;
 
 	my($rules,$states,$lex,$error)
-     = @$self{ 'RULES', 'STATES', 'LEX', 'ERROR' };
+     = @@$self{ 'RULES', 'STATES', 'LEX', 'ERROR' };
 	my($errstatus,$nberror,$token,$value,$stack,$check,$dotpos)
-     = @$self{ 'ERRST', 'NBERR', 'TOKEN', 'VALUE', 'STACK', 'CHECK', 'DOTPOS' };
+     = @@$self{ 'ERRST', 'NBERR', 'TOKEN', 'VALUE', 'STACK', 'CHECK', 'DOTPOS' };
 
 #DBG>	my($debug)=$$self{DEBUG};
 #DBG>	my($dbgerror)=0;
@@ -262,7 +331,7 @@ sub _Parse {
 	$$errstatus=0;
 	$$nberror=0;
 	($$token,$$value)=(undef,undef);
-	@$stack=( [ 0, undef ] );
+	@@$stack=( [ 0, undef ] );
 	$$check='';
 
     while(1) {
@@ -276,7 +345,7 @@ sub _Parse {
 #DBG>	and	print STDERR "In state $stateno:\n";
 #DBG>		$debug & 0x08
 #DBG>	and	print STDERR "Stack:[".
-#DBG>					 join(',',map { $$_[0] } @$stack).
+#DBG>					 join(',',map { $$_[0] } @@$stack).
 #DBG>					 "]\n";
 
 
@@ -324,7 +393,7 @@ sub _Parse {
 				};
 
 
-                push(@$stack,[ $act, $$value ]);
+                push(@@$stack,[ $act, $$value ]);
 
 					$$token ne ''	#Don't eat the eof
 				and	$$token=$$value=undef;
@@ -332,8 +401,8 @@ sub _Parse {
             };
 
             #reduce
-            my($lhs,$len,$code,@sempar,$semval);
-            ($lhs,$len,$code)=@{$$rules[-$act]};
+            my($lhs,$len,$code,@@sempar,$semval);
+            ($lhs,$len,$code)=@@{$$rules[-$act]};
 
 #DBG>			$debug & 0x04
 #DBG>		and	$act
@@ -344,22 +413,22 @@ sub _Parse {
 
             $$dotpos=$len;
 
-                unpack('A1',$lhs) eq '@'    #In line rule
+                unpack('A1',$lhs) eq '@@'    #In line rule
             and do {
-                    $lhs =~ /^\@[0-9]+\-([0-9]+)$/
+                    $lhs =~ /^\@@[0-9]+\-([0-9]+)$/
                 or  die "In line rule name '$lhs' ill formed: ".
                         "report it as a BUG.\n";
                 $$dotpos = $1;
             };
 
-            @sempar =       $$dotpos
-                        ?   map { $$_[1] } @$stack[ -$$dotpos .. -1 ]
+            @@sempar =       $$dotpos
+                        ?   map { $$_[1] } @@$stack[ -$$dotpos .. -1 ]
                         :   ();
 
-            $semval = $code ? &$code( $self, @sempar )
-                            : @sempar ? $sempar[0] : undef;
+            $semval = $code ? &$code( $self, @@sempar )
+                            : @@sempar ? $sempar[0] : undef;
 
-            splice(@$stack,-$len,$len);
+            splice(@@$stack,-$len,$len);
 
                 $$check eq 'ACCEPT'
             and do {
@@ -397,7 +466,7 @@ sub _Parse {
 #DBG>				$dbgerror=0;
 #DBG>			};
 
-			    push(@$stack,
+			    push(@@$stack,
                      [ $$states[$$stack[-1][0]]{GOTOS}{$lhs}, $semval ]);
                 $$check='';
                 next;
@@ -446,7 +515,7 @@ sub _Parse {
 
         $$errstatus=3;
 
-		while(	  @$stack
+		while(	  @@$stack
 			  and (		not exists($$states[$$stack[-1][0]]{ACTIONS})
 			        or  not exists($$states[$$stack[-1][0]]{ACTIONS}{error})
 					or	$$states[$$stack[-1][0]]{ACTIONS}{error} <= 0)) {
@@ -454,10 +523,10 @@ sub _Parse {
 #DBG>			$debug & 0x10
 #DBG>		and	print STDERR "**Pop state $$stack[-1][0].\n";
 
-			pop(@$stack);
+			pop(@@$stack);
 		}
 
-			@$stack
+			@@$stack
 		or	do {
 
 #DBG>			$debug & 0x10
@@ -473,7 +542,7 @@ sub _Parse {
 #DBG>						 $$states[$$stack[-1][0]]{ACTIONS}{error}.
 #DBG>						 ".\n";
 
-		push(@$stack, [ $$states[$$stack[-1][0]]{ACTIONS}{error}, undef ]);
+		push(@@$stack, [ $$states[$$stack[-1][0]]{ACTIONS}{error}, undef ]);
 
     }
 
@@ -571,7 +640,7 @@ sub _Parse {
 
     use Data::Dumper;
 
-    our ($VERSION) = (q$Revision: 1.10 $ =~ /([\d\.]+)/);
+    our ($VERSION) = (q$Revision: 1.1 $ =~ /([\d\.]+)/);
 
     my $dt;
     my $input;
@@ -606,7 +675,7 @@ sub new {
 	{#State 1
 		DEFAULT => -5,
 		GOTOS => {
-			'@4-1' => 5
+			'@@4-1' => 5
 		}
 	},
 	{#State 2
@@ -617,7 +686,7 @@ sub new {
 	{#State 3
 		DEFAULT => -1,
 		GOTOS => {
-			'@1-1' => 7
+			'@@1-1' => 7
 		}
 	},
 	{#State 4
@@ -655,13 +724,13 @@ sub new {
 	{#State 10
 		DEFAULT => -6,
 		GOTOS => {
-			'@5-3' => 14
+			'@@5-3' => 14
 		}
 	},
 	{#State 11
 		DEFAULT => -16,
 		GOTOS => {
-			'@11-1' => 15
+			'@@11-1' => 15
 		}
 	},
 	{#State 12
@@ -670,7 +739,7 @@ sub new {
 		},
 		DEFAULT => -2,
 		GOTOS => {
-			'@2-3' => 16
+			'@@2-3' => 16
 		}
 	},
 	{#State 13
@@ -705,7 +774,7 @@ sub new {
 	{#State 18
 		DEFAULT => -7,
 		GOTOS => {
-			'@6-5' => 24
+			'@@6-5' => 24
 		}
 	},
 	{#State 19
@@ -714,7 +783,7 @@ sub new {
 		},
 		DEFAULT => -19,
 		GOTOS => {
-			'@12-1' => 25
+			'@@12-1' => 25
 		}
 	},
 	{#State 20
@@ -730,7 +799,7 @@ sub new {
 	{#State 22
 		DEFAULT => -3,
 		GOTOS => {
-			'@3-5' => 29
+			'@@3-5' => 29
 		}
 	},
 	{#State 23
@@ -774,13 +843,13 @@ sub new {
 	{#State 31
 		DEFAULT => -8,
 		GOTOS => {
-			'@7-7' => 36
+			'@@7-7' => 36
 		}
 	},
 	{#State 32
 		DEFAULT => -21,
 		GOTOS => {
-			'@13-1' => 37
+			'@@13-1' => 37
 		}
 	},
 	{#State 33
@@ -837,7 +906,7 @@ sub new {
 	{#State 42
 		DEFAULT => -23,
 		GOTOS => {
-			'@14-1' => 48
+			'@@14-1' => 48
 		}
 	},
 	{#State 43
@@ -863,7 +932,7 @@ sub new {
 	{#State 47
 		DEFAULT => -9,
 		GOTOS => {
-			'@8-10' => 53
+			'@@8-10' => 53
 		}
 	},
 	{#State 48
@@ -911,13 +980,13 @@ sub new {
 	{#State 56
 		DEFAULT => -34,
 		GOTOS => {
-			'@15-9' => 62
+			'@@15-9' => 62
 		}
 	},
 	{#State 57
 		DEFAULT => -10,
 		GOTOS => {
-			'@9-12' => 63
+			'@@9-12' => 63
 		}
 	},
 	{#State 58
@@ -944,7 +1013,7 @@ sub new {
 	{#State 61
 		DEFAULT => -40,
 		GOTOS => {
-			'@18-6' => 71
+			'@@18-6' => 71
 		}
 	},
 	{#State 62
@@ -999,7 +1068,7 @@ sub new {
 	{#State 73
 		DEFAULT => -11,
 		GOTOS => {
-			'@10-14' => 79
+			'@@10-14' => 79
 		}
 	},
 	{#State 74
@@ -1039,7 +1108,7 @@ sub new {
 	{#State 82
 		DEFAULT => -35,
 		GOTOS => {
-			'@16-13' => 85
+			'@@16-13' => 85
 		}
 	},
 	{#State 83
@@ -1069,7 +1138,7 @@ sub new {
 	{#State 88
 		DEFAULT => -36,
 		GOTOS => {
-			'@17-17' => 89
+			'@@17-17' => 89
 		}
 	},
 	{#State 89
@@ -1101,19 +1170,19 @@ sub new {
 		 '$start', 2, undef
 	],
 	[#Rule 1
-		 '@1-1', 0,
+		 '@@1-1', 0,
 sub
 #line 101 "YappRcsParser.yp"
 {warn "admin OK\n" if $debug}
 	],
 	[#Rule 2
-		 '@2-3', 0,
+		 '@@2-3', 0,
 sub
 #line 102 "YappRcsParser.yp"
 {warn "delta OK\n" if $debug}
 	],
 	[#Rule 3
-		 '@3-5', 0,
+		 '@@3-5', 0,
 sub
 #line 103 "YappRcsParser.yp"
 {warn "desc  OK\n" if $debug}
@@ -1125,43 +1194,43 @@ sub
 {warn "Parsed OK!\n" if $debug;}
 	],
 	[#Rule 5
-		 '@4-1', 0,
+		 '@@4-1', 0,
 sub
 #line 108 "YappRcsParser.yp"
 {warn "head  OK\n" if $debug}
 	],
 	[#Rule 6
-		 '@5-3', 0,
+		 '@@5-3', 0,
 sub
 #line 109 "YappRcsParser.yp"
 {warn "branc OK\n" if $debug}
 	],
 	[#Rule 7
-		 '@6-5', 0,
+		 '@@6-5', 0,
 sub
 #line 110 "YappRcsParser.yp"
 {warn "acces OK\n" if $debug}
 	],
 	[#Rule 8
-		 '@7-7', 0,
+		 '@@7-7', 0,
 sub
 #line 111 "YappRcsParser.yp"
 {warn "symbl OK\n" if $debug}
 	],
 	[#Rule 9
-		 '@8-10', 0,
+		 '@@8-10', 0,
 sub
 #line 112 "YappRcsParser.yp"
 {warn "lock  OK\n" if $debug}
 	],
 	[#Rule 10
-		 '@9-12', 0,
+		 '@@9-12', 0,
 sub
 #line 113 "YappRcsParser.yp"
 {warn "commt OK\n" if $debug}
 	],
 	[#Rule 11
-		 '@10-14', 0,
+		 '@@10-14', 0,
 sub
 #line 114 "YappRcsParser.yp"
 {warn "expan OK\n" if $debug}
@@ -1182,7 +1251,7 @@ sub
 {warn "branch OK(EMPTY)\n" if $debug}
 	],
 	[#Rule 16
-		 '@11-1', 0,
+		 '@@11-1', 0,
 sub
 #line 123 "YappRcsParser.yp"
 {$state='nums'}
@@ -1200,7 +1269,7 @@ sub
 {warn "access OK",$_[1],"\n" if $debug}
 	],
 	[#Rule 19
-		 '@12-1', 0,
+		 '@@12-1', 0,
 sub
 #line 129 "YappRcsParser.yp"
 {$state='ids'}
@@ -1212,7 +1281,7 @@ sub
 {warn "access OK",$_[1]," ",$_[3][0],"\n" if $debug}
 	],
 	[#Rule 21
-		 '@13-1', 0,
+		 '@@13-1', 0,
 sub
 #line 133 "YappRcsParser.yp"
 {$state='symnums'}
@@ -1221,7 +1290,7 @@ sub
 		 'symbols', 4, undef
 	],
 	[#Rule 23
-		 '@14-1', 0,
+		 '@@14-1', 0,
 sub
 #line 136 "YappRcsParser.yp"
 {$state='idnums'}
@@ -1257,19 +1326,19 @@ sub
 		 'delta', 0, undef
 	],
 	[#Rule 34
-		 '@15-9', 0,
+		 '@@15-9', 0,
 sub
 #line 160 "YappRcsParser.yp"
 {$state='ido'}
 	],
 	[#Rule 35
-		 '@16-13', 0,
+		 '@@16-13', 0,
 sub
 #line 161 "YappRcsParser.yp"
 {$state='nums'}
 	],
 	[#Rule 36
-		 '@17-17', 0,
+		 '@@17-17', 0,
 sub
 #line 162 "YappRcsParser.yp"
 {$state='nums'}
@@ -1290,7 +1359,7 @@ sub
 		 'deltatext', 0, undef
 	],
 	[#Rule 40
-		 '@18-6', 0,
+		 '@@18-6', 0,
 sub
 #line 178 "YappRcsParser.yp"
 {$state='longstring';}
@@ -1326,7 +1395,7 @@ sub
 		 'word', 1, undef
 	]
 ],
-                                  @_);
+                                  @@_);
     bless($self,$class);
 }
 
@@ -1351,27 +1420,27 @@ sub revs_to_co {
         $date{$rdate} = $rev;
     }
 
-    my @alldates  = sort keys %date;
-    my @dates2add = @$dates_to_co;
+    my @@alldates  = sort keys %date;
+    my @@dates2add = @@$dates_to_co;
 
     my $bi=0;
-    my($a,$b,@dates2add_proper);
+    my($a,$b,@@dates2add_proper);
 
-    for $b (@dates2add) {
-	for $a (@alldates) {
+    for $b (@@dates2add) {
+	for $a (@@alldates) {
 	    $dates2add_proper[$bi]=$a if ($a lt $b);
 	}
 	$bi++;
     }
 
-    for (@dates2add_proper) {
-	push @$revs, $date{$_} if (defined $date{$_});
+    for (@@dates2add_proper) {
+	push @@$revs, $date{$_} if (defined $date{$_});
     }
 
     if($debug){
-        print STDERR "$_\n" for(@$revs);
-        print STDERR "$_\n" for(@dates2add_proper);
-        print STDERR "$_\n" for(@dates2add);
+        print STDERR "$_\n" for(@@$revs);
+        print STDERR "$_\n" for(@@dates2add_proper);
+        print STDERR "$_\n" for(@@dates2add);
     }
 
     $dt->revs2co($revs);
@@ -1407,7 +1476,7 @@ sub _Error {
         delete $_[0]->YYData->{ERRMSG};
         return;
     };
-    warn "\nSyntax error.\n";
+    warn "Syntax error.\n";
 
 }
 
@@ -1428,16 +1497,16 @@ sub _Lexer {
 
         $state = 'norm';
 
-        return('',[ undef, -1 ]) if ($$input !~ m/\G[\s\n]*@/sgc);
+        return('',[ undef, -1 ]) if ($$input !~ m/\G[\s\n]*@@/sgc);
 
         my $text_tmp='';
         my $text;
-        while ($$input =~ m/\G((?:[^@\n]|@@)*\n?)/gcs) {
+        while ($$input =~ m/\G((?:[^@@\n]|@@@@)*\n?)/gcs) {
             $text_tmp = $1;
-            $text_tmp =~ s/@@/@/g;
+            $text_tmp =~ s/@@@@/@@/g;
             $text .= $text_tmp;
         }
-        return('',[ undef, -1 ]) if ($$input !~ m/\G[\s\n]*@/sgc);
+        return('',[ undef, -1 ]) if ($$input !~ m/\G[\s\n]*@@/sgc);
 
         return('string',[\$text]);
     };
@@ -1488,17 +1557,17 @@ sub _Lexer {
         # id
         $$input =~ m/\G
                          ((?:[\d\.]+)?)                      # {num}
-                         ([^\$,\.:;@\x00-\x1F])              # idchar
-                         ([^\$,\.:;@\x00-\x1F]|(?:[\d\.]+))* # {idchar | num}*
+                         ([^\$,\.:;@@\x00-\x1F])              # idchar
+                         ([^\$,\.:;@@\x00-\x1F]|(?:[\d\.]+))* # {idchar | num}*
                     /xgc                      
                                     and return('id',      [$1,$2,$3] );
 
 
         # simple string
         $$input =~ m/\G
-                           @
-                           ((?:[^@]|@@)*)
-                           @
+                           @@
+                           ((?:[^@@]|@@@@)*)
+                           @@
                     /xgcs                      
                                     and return('string',  [$1] );
 
@@ -1515,8 +1584,8 @@ sub _Lexer {
         $$input =~ m{\G
                          (?:
                          (\d?)
-                         ([^\$,\.:;@\x00-\x1F])
-                         ([^\$,\.:;@\x00-\x1F]*)
+                         ([^\$,\.:;@@\x00-\x1F])
+                         ([^\$,\.:;@@\x00-\x1F]*)
                          )*
                    }xgc           
                    and return('ids', [$1,$2,$3]);
@@ -1533,8 +1602,8 @@ sub _Lexer {
         $$input =~ m{\G
                          (?:
                          (\d*)                   # {digit}*
-                         ([^\$,\.:;@\x00-\x1F])  # idchar
-                         ([^\$,\.:;@\x00-\x1F]*) # {idchar | digit}*
+                         ([^\$,\.:;@@\x00-\x1F])  # idchar
+                         ([^\$,\.:;@@\x00-\x1F]*) # {idchar | digit}*
                          :                       # :
                          ([\d\.]+)[\s\n\r]*      # num
                          )*
@@ -1554,8 +1623,8 @@ sub _Lexer {
                          (?:
 
                          ((?:[\d\.]+)?)                      # {num}
-                         ([^\$,\.:;@\x00-\x1F])              # idchar
-                         ([^\$,\.:;@\x00-\x1F]|(?:[\d\.]+))* # {idchar | num}*
+                         ([^\$,\.:;@@\x00-\x1F])              # idchar
+                         ([^\$,\.:;@@\x00-\x1F]|(?:[\d\.]+))* # {idchar | num}*
                          :                                   # :
                          ([\d\.]+)                           # num
                          )*
@@ -1574,8 +1643,8 @@ sub _Lexer {
         $$input =~ m{\G
                          (?:
                          ((?:[\d\.]+)?)                      # {num}
-                         ([^\$,\.:;@\x00-\x1F])              # idchar
-                         ([^\$,\.:;@\x00-\x1F]|(?:[\d\.]+))* # {idchar | num}*
+                         ([^\$,\.:;@@\x00-\x1F])              # idchar
+                         ([^\$,\.:;@@\x00-\x1F]|(?:[\d\.]+))* # {idchar | num}*
                          )?
                    }xgc           
                    and return('ido', [$1,$2,$3]);
@@ -1607,8 +1676,6 @@ sub Run {
     $revs_to_co  = shift;
     $dates_to_co = shift;
 
-    $dt = undef;
-
     $dt = new VCS::Rcs::Deltatext();
     $state = 'norm';
     $ft = 1;
@@ -1620,3 +1687,477 @@ sub Run {
 }
 
 1;
+@
+
+
+1.8
+log
+@Solved some 'undefined ...' warnings.
+@
+text
+@d10 1
+a10 1
+package Rcs::YappRcsParser;
+d501 1
+a501 1
+#yapp -s -m 'Rcs::YappRcsParser' -o 'lib/Rcs/YappRcsParser.pm' YappRcsParser.yp
+d570 1
+a570 1
+    use Rcs::Deltatext;
+d574 1
+a574 1
+    our ($VERSION) = (q$Revision: 1.1 $ =~ /([\d\.]+)/);
+d1610 1
+a1610 1
+    $dt = new Rcs::Deltatext();
+@
+
+
+1.7
+log
+@date co future added.
+@
+text
+@d574 1
+a574 1
+    our ($VERSION) = (q$Revision: 1.1 $ =~ /([\d\.]+)/);
+d1367 3
+a1369 1
+    push @@$revs, $date{$_} for (@@dates2add_proper);
+@
+
+
+1.6
+log
+@Fixed a bug in the lexer, causing strings ending without a new line to breake the syntax in the grammar.
+@
+text
+@d572 3
+a574 1
+    our ($VERSION) = (q$Revision: 1.1 $ =~ /([\d\.]+)/);
+d580 3
+a582 1
+    my $init_rev_no;
+a584 1
+    require Data::Dumper if $debug;
+d1106 1
+a1106 1
+#line 98 "YappRcsParser.yp"
+d1112 1
+a1112 1
+#line 99 "YappRcsParser.yp"
+d1118 1
+a1118 1
+#line 100 "YappRcsParser.yp"
+d1124 1
+a1124 1
+#line 102 "YappRcsParser.yp"
+d1130 1
+a1130 1
+#line 105 "YappRcsParser.yp"
+d1136 1
+a1136 1
+#line 106 "YappRcsParser.yp"
+d1142 1
+a1142 1
+#line 107 "YappRcsParser.yp"
+d1148 1
+a1148 1
+#line 108 "YappRcsParser.yp"
+d1154 1
+a1154 1
+#line 109 "YappRcsParser.yp"
+d1160 1
+a1160 1
+#line 110 "YappRcsParser.yp"
+d1166 1
+a1166 1
+#line 111 "YappRcsParser.yp"
+d1181 1
+a1181 1
+#line 119 "YappRcsParser.yp"
+d1187 1
+a1187 1
+#line 120 "YappRcsParser.yp"
+d1193 1
+a1193 1
+#line 121 "YappRcsParser.yp"
+d1199 1
+a1199 1
+#line 125 "YappRcsParser.yp"
+d1205 1
+a1205 1
+#line 126 "YappRcsParser.yp"
+d1211 1
+a1211 1
+#line 127 "YappRcsParser.yp"
+d1217 1
+a1217 1
+#line 130 "YappRcsParser.yp"
+d1226 1
+a1226 1
+#line 133 "YappRcsParser.yp"
+d1262 1
+a1262 1
+#line 157 "YappRcsParser.yp"
+d1268 1
+a1268 1
+#line 158 "YappRcsParser.yp"
+d1274 1
+a1274 1
+#line 159 "YappRcsParser.yp"
+d1280 1
+a1280 1
+#line 161 "YappRcsParser.yp"
+d1284 4
+a1287 1
+		 'desc', 2, undef
+d1295 1
+a1295 1
+#line 174 "YappRcsParser.yp"
+d1301 1
+a1301 1
+#line 175 "YappRcsParser.yp"
+d1303 1
+a1303 1
+             #print STDERR $_[2][0],"        \r";
+d1333 33
+a1365 1
+#line 188 "YappRcsParser.yp"
+d1367 10
+d1382 1
+a1382 1
+    $init_rev_no = $rev;
+d1603 4
+a1606 2
+    my $self =shift;
+    $input   =shift;
+d1608 1
+a1608 1
+    $dt = new Rcs::Deltatext;
+d1611 1
+a1611 1
+    $init_rev_no = undef;
+@
+
+
+1.5
+log
+@added copyright info.
+@
+text
+@d572 1
+a572 1
+    our ($VERSION) = (q$Revision: 1.1 $ =~ /([\d\.]+)/);
+d1385 1
+a1385 1
+        while ($$input =~ m/\G((?:[^@@\n]|@@@@)*\n)/gcs) {
+@
+
+
+1.4
+log
+@sorted the problem of calling new more then onece in one program.
+@
+text
+@d524 42
+d572 1
+a572 1
+    our ($VERSION) = (q$Revision: 1.1 $ =~ /([\d\.]+)/);
+d1103 1
+a1103 1
+#line 56 "YappRcsParser.yp"
+d1109 1
+a1109 1
+#line 57 "YappRcsParser.yp"
+d1115 1
+a1115 1
+#line 58 "YappRcsParser.yp"
+d1121 1
+a1121 1
+#line 60 "YappRcsParser.yp"
+d1127 1
+a1127 1
+#line 63 "YappRcsParser.yp"
+d1133 1
+a1133 1
+#line 64 "YappRcsParser.yp"
+d1139 1
+a1139 1
+#line 65 "YappRcsParser.yp"
+d1145 1
+a1145 1
+#line 66 "YappRcsParser.yp"
+d1151 1
+a1151 1
+#line 67 "YappRcsParser.yp"
+d1157 1
+a1157 1
+#line 68 "YappRcsParser.yp"
+d1163 1
+a1163 1
+#line 69 "YappRcsParser.yp"
+d1178 1
+a1178 1
+#line 77 "YappRcsParser.yp"
+d1184 1
+a1184 1
+#line 78 "YappRcsParser.yp"
+d1190 1
+a1190 1
+#line 79 "YappRcsParser.yp"
+d1196 1
+a1196 1
+#line 83 "YappRcsParser.yp"
+d1202 1
+a1202 1
+#line 84 "YappRcsParser.yp"
+d1208 1
+a1208 1
+#line 85 "YappRcsParser.yp"
+d1214 1
+a1214 1
+#line 88 "YappRcsParser.yp"
+d1223 1
+a1223 1
+#line 91 "YappRcsParser.yp"
+d1259 1
+a1259 1
+#line 115 "YappRcsParser.yp"
+d1265 1
+a1265 1
+#line 116 "YappRcsParser.yp"
+d1271 1
+a1271 1
+#line 117 "YappRcsParser.yp"
+d1277 1
+a1277 1
+#line 119 "YappRcsParser.yp"
+d1289 1
+a1289 1
+#line 132 "YappRcsParser.yp"
+d1295 1
+a1295 1
+#line 133 "YappRcsParser.yp"
+d1327 1
+a1327 1
+#line 146 "YappRcsParser.yp"
+@
+
+
+1.3
+log
+@version info added.
+a smal fix to check emty text.
+@
+text
+@d530 1
+a530 3
+    our $VERSION = (q$Revision: 1.1 $ =~ /([\d\.]+)/);
+
+    my $dt = new Rcs::Deltatext;
+d532 1
+d534 3
+a536 4
+
+    my $state = 'norm';
+
+    my $ft = 1;
+a540 2
+    my $init_rev_no;
+
+d1061 1
+a1061 1
+#line 60 "YappRcsParser.yp"
+d1067 1
+a1067 1
+#line 61 "YappRcsParser.yp"
+d1073 1
+a1073 1
+#line 62 "YappRcsParser.yp"
+d1079 1
+a1079 1
+#line 64 "YappRcsParser.yp"
+d1085 1
+a1085 1
+#line 67 "YappRcsParser.yp"
+d1091 1
+a1091 1
+#line 68 "YappRcsParser.yp"
+d1097 1
+a1097 1
+#line 69 "YappRcsParser.yp"
+d1103 1
+a1103 1
+#line 70 "YappRcsParser.yp"
+d1109 1
+a1109 1
+#line 71 "YappRcsParser.yp"
+d1115 1
+a1115 1
+#line 72 "YappRcsParser.yp"
+d1121 1
+a1121 1
+#line 73 "YappRcsParser.yp"
+d1136 1
+a1136 1
+#line 81 "YappRcsParser.yp"
+d1142 1
+a1142 1
+#line 82 "YappRcsParser.yp"
+d1148 1
+a1148 1
+#line 83 "YappRcsParser.yp"
+d1154 1
+a1154 1
+#line 87 "YappRcsParser.yp"
+d1160 1
+a1160 1
+#line 88 "YappRcsParser.yp"
+d1166 1
+a1166 1
+#line 89 "YappRcsParser.yp"
+d1172 1
+a1172 1
+#line 92 "YappRcsParser.yp"
+d1181 1
+a1181 1
+#line 95 "YappRcsParser.yp"
+d1217 1
+a1217 1
+#line 119 "YappRcsParser.yp"
+d1223 1
+a1223 1
+#line 120 "YappRcsParser.yp"
+d1229 1
+a1229 1
+#line 121 "YappRcsParser.yp"
+d1235 1
+a1235 1
+#line 123 "YappRcsParser.yp"
+d1247 1
+a1247 1
+#line 136 "YappRcsParser.yp"
+d1253 1
+a1253 1
+#line 137 "YappRcsParser.yp"
+d1285 1
+a1285 1
+#line 150 "YappRcsParser.yp"
+d1515 5
+@
+
+
+1.2
+log
+@Last fixes.
+@
+text
+@d498 1
+a498 1
+# you should have CPAN module Parse::Yapp installed on you 
+d527 1
+a527 1
+    use Data::Dumper;
+d530 2
+d540 2
+a541 1
+    my $debug = 0;
+d1065 1
+a1065 1
+#line 57 "YappRcsParser.yp"
+d1071 1
+a1071 1
+#line 58 "YappRcsParser.yp"
+d1077 1
+a1077 1
+#line 59 "YappRcsParser.yp"
+d1083 1
+a1083 1
+#line 61 "YappRcsParser.yp"
+d1089 1
+a1089 1
+#line 64 "YappRcsParser.yp"
+d1095 1
+a1095 1
+#line 65 "YappRcsParser.yp"
+d1101 1
+a1101 1
+#line 66 "YappRcsParser.yp"
+d1107 1
+a1107 1
+#line 67 "YappRcsParser.yp"
+d1113 1
+a1113 1
+#line 68 "YappRcsParser.yp"
+d1119 1
+a1119 1
+#line 69 "YappRcsParser.yp"
+d1125 1
+a1125 1
+#line 70 "YappRcsParser.yp"
+d1140 1
+a1140 1
+#line 78 "YappRcsParser.yp"
+d1146 1
+a1146 1
+#line 79 "YappRcsParser.yp"
+d1152 1
+a1152 1
+#line 80 "YappRcsParser.yp"
+d1158 1
+a1158 1
+#line 84 "YappRcsParser.yp"
+d1164 1
+a1164 1
+#line 85 "YappRcsParser.yp"
+d1170 1
+a1170 1
+#line 86 "YappRcsParser.yp"
+d1176 1
+a1176 1
+#line 89 "YappRcsParser.yp"
+d1185 1
+a1185 1
+#line 92 "YappRcsParser.yp"
+d1221 1
+a1221 1
+#line 116 "YappRcsParser.yp"
+d1227 1
+a1227 1
+#line 117 "YappRcsParser.yp"
+d1233 1
+a1233 1
+#line 118 "YappRcsParser.yp"
+d1239 1
+a1239 1
+#line 120 "YappRcsParser.yp"
+d1251 1
+a1251 1
+#line 133 "YappRcsParser.yp"
+d1257 1
+a1257 1
+#line 134 "YappRcsParser.yp"
+d1289 1
+a1289 1
+#line 147 "YappRcsParser.yp"
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d1081 1
+a1081 1
+{warn "Parsed OK!\n";}
+@
+
+
+1.1.1.1
+log
+@Initial release.
+@
+text
+@@
