@@ -41,7 +41,7 @@
 #
 package VCS::Rcs::Deltatext;
 
-require 5.6.0;
+require 5.8.0;
 use strict;
 use warnings;
 

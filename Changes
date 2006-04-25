@@ -1,3 +1,9 @@
+2006-04-26  Ziya Suzen  <ziya@suzen.net>
+
+   * Version 0.07
+   * Covert to Module::Build
+   * Created test framework
+
 2001-10-09  Ziya Suzen  <ziya@ripe.net>
 
 	* lib/Rcs/Deltatext.pm, lib/Rcs/Parser.pm, lib/Rcs/YappRcsParser.pm:

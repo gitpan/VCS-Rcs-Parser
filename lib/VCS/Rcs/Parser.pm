@@ -42,14 +42,14 @@
 
 package VCS::Rcs::Parser;
 
-require 5.6.0;
+require 5.8.0;
 use strict;
 use warnings;
 use Carp;
 
 use VCS::Rcs::YappRcsParser;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 sub new {
     my $this  = shift;
